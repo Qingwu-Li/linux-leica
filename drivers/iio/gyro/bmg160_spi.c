@@ -15,6 +15,9 @@ static const struct regmap_config bmg160_regmap_spi_conf = {
 static int bmg160_spi_probe(struct spi_device *spi)
 {
 	struct regmap *regmap;
+
+	pr_info("BMG160: bmg160_spi_probe\n");
+
 	const struct spi_device_id *id = spi_get_device_id(spi);
 
 	regmap = devm_regmap_init_spi(spi, &bmg160_regmap_spi_conf);
@@ -37,6 +40,8 @@ static int bmg160_spi_remove(struct spi_device *spi)
 static const struct spi_device_id bmg160_spi_id[] = {
 	{"bmg160", 0},
 	{"bmi055_gyro", 0},
+	{"bmi085_gyro", 0},
+	{"bmi088_gyro", 0},
 	{}
 };
 

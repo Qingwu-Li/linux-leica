@@ -89,7 +89,8 @@
 #define BMG160_MAX_STARTUP_TIME_MS	80
 
 #define BMG160_AUTO_SUSPEND_DELAY_MS	2000
-
+#undef pr_info
+#define pr_info pr_err
 struct bmg160_data {
 	struct regmap *regmap;
 	struct iio_trigger *dready_trig;
@@ -236,7 +237,9 @@ static int bmg160_chip_init(struct bmg160_data *data)
 	int ret;
 	unsigned int val;
 
-	/*
+	pr_info("BMG160: bmg160_chip_init\n");
+	
+/*
 	 * Reset chip to get it in a known good state. A delay of 30ms after
 	 * reset is required according to the datasheet.
 	 */
@@ -1077,6 +1080,8 @@ int bmg160_core_probe(struct device *dev, struct regmap *regmap, int irq,
 	struct bmg160_data *data;
 	struct iio_dev *indio_dev;
 	int ret;
+
+	pr_info("BMG160: bmg160_core_probe\n");
 
 	indio_dev = devm_iio_device_alloc(dev, sizeof(*data));
 	if (!indio_dev)
