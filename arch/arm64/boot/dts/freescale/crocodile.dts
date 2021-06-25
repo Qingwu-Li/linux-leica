@@ -5,7 +5,6 @@
  */
 
 /dts-v1/;
-
 #include <dt-bindings/usb/pd.h>
 #include "imx8mm.dtsi"
 
@@ -18,26 +17,32 @@
 		#size-cells = <2>;
 		ranges;
 
-		rpmsg_reserved: rpmsg@0xb8000000 {
+		m4_reserved: m4@0x80000000 {
 			no-map;
-			reg = <0 0xb8000000 0 0x400000>;
+			reg = <0 0x80000000 0 0x1000000>;
+		};
+
+		vdev0vring0: vdev0vring0@b8000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xb8000000 0 0x8000>;
+			no-map;
+		};
+
+		vdev0vring1: vdev0vring1@b8008000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xb8008000 0 0x8000>;
+			no-map;
+		};
+
+		vdevbuffer: vdevbuffer@b8400000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xb8400000 0 0x100000>;
+			no-map;
 		};
 	};
 
 	chosen {
 		stdout-path = &uart2;
-	};
-
-	leds {
-		compatible = "gpio-leds";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_led>;
-
-		status {
-			label = "status";
-			gpios = <&gpio3 16 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
-		};
 	};
 
 	modem_reset: modem-reset {
@@ -192,6 +197,17 @@
 		constant-charge-voltage-max-microvolt = <4200000>;
 		factory-internal-resistance-micro-ohms = <35>;
 	};
+	imx8mm-cm4 {
+		compatible = "fsl,imx8mm-cm4";
+		rsc-da = <0xb8000000>;
+		clocks = <&clk IMX8MM_CLK_M4_DIV>;
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu 0 1
+			  &mu 1 1
+			  &mu 3 1>;
+		memory-region = <&vdev0vring0>, <&vdev0vring1>, <&vdevbuffer>;
+		syscon = <&src>;
+	};
 };
 
 &A53_0 {
@@ -228,7 +244,7 @@
 		};
 	};
 };
-
+/*
 &pcie0{
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie0>;
@@ -243,7 +259,7 @@
 	reserved-region = <&rpmsg_reserved>;
 	status = "okay";
 };
-
+*/
 &sai3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai3>;
@@ -332,11 +348,12 @@
 	status = "okay";
 };
 
-&ecspi2 {
+
+&ecspi1 {
 	fsl,spi-num-chipselects = <1>;
 	cs-gpios = <0>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_ecspi2>;
+	pinctrl-0 = <&pinctrl_ecspi1>;
 	status = "okay";
 	spidev@0x00 {
 	compatible = "lgs-crocodile,spi";
@@ -344,6 +361,22 @@
 	reg = <0>;
 	};
 };
+
+
+
+&ecspi2 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	status = "disabled";
+	spidev@0x00 {
+	compatible = "lgs-crocodile,spi";
+	spi-max-frequency = <10000000>;
+	reg = <0>;
+	};
+};
+
 &uart1 { /* BT */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
@@ -359,15 +392,15 @@
 	pinctrl-0 = <&pinctrl_uart2>;
 	status = "okay";
 };
-
+/*
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
 	assigned-clocks = <&clk IMX8MM_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	fsl,uart-has-rtscts;
-	status = "okay";
-};
+	status = "disabled"; //Disable uart to enable escpi1
+};*/
 
 &usbotg1 {
 	dr_mode = "otg";
@@ -622,16 +655,11 @@
 		battery-name = "battery";
 		monitored-battery = <&bat>;
 	};
-	iis2mdc@1e {
-		compatible = "st,iis2mdc";
-		reg = <0x1e>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <22 IRQ_TYPE_EDGE_RISING>;
-		st,drdy-int-pin = <1>;
-	};
+
 	pca6416: gpio@20 {
 		compatible = "ti,tca6416";
 		reg = <0x20>;
+		status = "disabled";
 		gpio-controller;
 		#gpio-cells = <2>;
 		vcc-supply = <&buck4_reg>;
@@ -640,6 +668,7 @@
 	ak4458_1: ak4458@10 {
 		compatible = "asahi-kasei,ak4458";
 		reg = <0x10>;
+		status = "disabled";
 		AVDD-supply = <&reg_audio_board>;
 		DVDD-supply = <&reg_audio_board>;
 	};
@@ -647,6 +676,7 @@
 	ak4458_2: ak4458@12 {
 		compatible = "asahi-kasei,ak4458";
 		reg = <0x12>;
+		status = "disabled";
 		AVDD-supply = <&reg_audio_board>;
 		DVDD-supply = <&reg_audio_board>;
 	};
@@ -654,6 +684,7 @@
 	ak5558: ak5558@13 {
 		compatible = "asahi-kasei,ak5558";
 		reg = <0x13>;
+		status = "disabled";
 		ak5558,pdn-gpio = <&pca6416 3 GPIO_ACTIVE_HIGH>;
 		AVDD-supply = <&reg_audio_board>;
 		DVDD-supply = <&reg_audio_board>;
@@ -662,6 +693,7 @@
 	ak4497: ak4497@11 {
 		compatible = "asahi-kasei,ak4497";
 		reg = <0x11>;
+		status = "disabled";
 		ak4497,pdn-gpio = <&pca6416 5 GPIO_ACTIVE_HIGH>;
 		AVDD-supply = <&reg_audio_board>;
 		DVDD-supply = <&reg_audio_board>;
@@ -670,7 +702,7 @@
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
 		reg = <0x3c>;
-		status = "okay";
+		status = "disabled";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_csi_pwn>, <&pinctrl_csi_rst>;
 		clocks = <&clk IMX8MM_CLK_CLKO1>;
@@ -734,12 +766,6 @@
 			MX8MM_IOMUXC_NAND_DATA01_QSPI_A_DATA1           0x82
 			MX8MM_IOMUXC_NAND_DATA02_QSPI_A_DATA2           0x82
 			MX8MM_IOMUXC_NAND_DATA03_QSPI_A_DATA3           0x82
-		>;
-	};
-
-	pinctrl_gpio_led: gpioledgrp {
-		fsl,pins = <
-			MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16	0x19
 		>;
 	};
 
@@ -908,14 +934,14 @@
 		>;
 	};
 
-	pinctrl_uart3: uart3grp {
+	/*pinctrl_uart3: uart3grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_ECSPI1_SCLK_UART3_DCE_RX		0x140
 			MX8MM_IOMUXC_ECSPI1_MOSI_UART3_DCE_TX		0x140
 			MX8MM_IOMUXC_ECSPI1_SS0_UART3_DCE_RTS_B		0x140
 			MX8MM_IOMUXC_ECSPI1_MISO_UART3_DCE_CTS_B	0x140
 		>;
-	};
+	};*/
 
 	pinctrl_usdhc1_gpio: usdhc1grpgpio {
 		fsl,pins = <
@@ -1051,6 +1077,14 @@
 			MX8MM_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B	0xc6
 		>;
 	};
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO       0x00000116
+			MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI       0x00000116
+			MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK       0x00000116
+			MX8MM_IOMUXC_ECSPI1_SS0_ECSPI1_SS0         0x00000116
+		>;
+	};
 
 	pinctrl_ecspi2: ecspi2grp {
 		fsl,pins = <
@@ -1111,3 +1145,10 @@
 &gpu {
 	status = "okay";
 };
+
+
+&uart4 {
+	status = "disabled";
+};
+
+
