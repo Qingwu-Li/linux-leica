@@ -421,6 +421,18 @@ static const struct bmi088_accel_chip_info bmi088_accel_chip_info_tbl[] = {
 		.channels = bmi088_accel_channels,
 		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
 	},
+	[1] = {
+		.name = "bmi088a",
+		.chip_id = 0x1F,
+		.channels = bmi088_accel_channels,
+		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
+	},
+	[2] = {
+		.name = "bmi090l",
+		.chip_id = 0x1a,
+		.channels = bmi088_accel_channels,
+		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
+	},
 };
 
 static const struct iio_info bmi088_accel_info = {
@@ -463,6 +475,9 @@ static int bmi088_accel_chip_init(struct bmi088_accel_data *data)
 		dev_err(dev, "Error: Reading chip id\n");
 		return ret;
 	}
+
+	if (val == 0)
+		return -EPROBE_DEFER;
 
 	/* Validate chip ID */
 	for (i = 0; i < ARRAY_SIZE(bmi088_accel_chip_info_tbl); i++) {

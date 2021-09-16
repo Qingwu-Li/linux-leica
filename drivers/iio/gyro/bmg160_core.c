@@ -253,6 +253,9 @@ static int bmg160_chip_init(struct bmg160_data *data)
 		return ret;
 	}
 
+	if (val == 0)
+		return -EPROBE_DEFER;
+
 	dev_dbg(dev, "Chip Id %x\n", val);
 	if (val != BMG160_CHIP_ID_VAL) {
 		dev_err(dev, "invalid chip %x\n", val);
