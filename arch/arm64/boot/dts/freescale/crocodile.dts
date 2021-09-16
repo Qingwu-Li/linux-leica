@@ -333,17 +333,35 @@
 };
 
 &ecspi2 {
-	fsl,spi-num-chipselects = <1>;
-	cs-gpios = <0>;
+	fsl,spi-num-chipselects = <2>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_ecspi2>;
-	status = "okay";
-	spidev@0x00 {
-	compatible = "lgs-crocodile,spi";
-	spi-max-frequency = <10000000>;
-	reg = <0>;
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>, <&gpio3 21 GPIO_ACTIVE_LOW>;
+	status = "okay";	
+	//ACCEL :SDO1 INT1 INT2 CSB1-ECSPI2_SS0
+	//GYRO  :SDO2 INT3 INT4 CSB2-GPIO3.21
+	//INT3 gpio3.23
+	accel:bmg088@0 {
+		compatible = "bosch,bmi088-accel";
+		spi-max-frequency = <50000>;
+		reg = <0>;
+ 		interrupt-parent = <&gpio3>;
+		interrupts = <23 IRQ_TYPE_LEVEL_LOW>; 
+		interrupt-names = "INT2";
 	};
+	
+	gyro:bmg088@1 {
+		compatible = "bosch,bmi088_gyro";
+		spi-max-frequency = <50000>;
+		reg = <1>;
+ 		interrupt-parent = <&gpio3>;
+		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-names = "INT3";
+
+	};
+	
 };
+
 &uart1 { /* BT */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
@@ -1054,10 +1072,11 @@
 
 	pinctrl_ecspi2: ecspi2grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_ECSPI2_MISO_ECSPI2_MISO 0x116
-			MX8MM_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI 0x116
-			MX8MM_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK 0x16
-			MX8MM_IOMUXC_ECSPI2_SS0_ECSPI2_SS0   0x116
+			MX8MM_IOMUXC_ECSPI2_MISO_ECSPI2_MISO       0x00000116
+			MX8MM_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI       0x00000116
+			MX8MM_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK       0x00001916
+			MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13         0x400001F6
+			MX8MM_IOMUXC_SAI5_RXD0_GPIO3_IO21          0x00000116
 		>;
 	};
 };
