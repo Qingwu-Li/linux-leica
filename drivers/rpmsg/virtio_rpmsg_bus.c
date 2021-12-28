@@ -561,6 +561,7 @@ static int rpmsg_send_offchannel_raw(struct rpmsg_device *rpdev,
 	struct scatterlist sg;
 	struct rpmsg_hdr *msg;
 	int err;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	/* bcasting isn't allowed */
 	if (src == RPMSG_ADDR_ANY || dst == RPMSG_ADDR_ANY) {
@@ -653,6 +654,7 @@ static int virtio_rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len)
 {
 	struct rpmsg_device *rpdev = ept->rpdev;
 	u32 src = ept->addr, dst = rpdev->dst;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	return rpmsg_send_offchannel_raw(rpdev, src, dst, data, len, true);
 }
@@ -705,6 +707,7 @@ static int rpmsg_recv_single(struct virtproc_info *vrp, struct device *dev,
 	struct rpmsg_endpoint *ept;
 	struct scatterlist sg;
 	int err;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	dev_dbg(dev, "From: 0x%x, To: 0x%x, Len: %d, Flags: %d, Reserved: %d\n",
 		msg->src, msg->dst, msg->len, msg->flags, msg->reserved);
@@ -770,6 +773,7 @@ static void rpmsg_recv_done(struct virtqueue *rvq)
 	struct rpmsg_hdr *msg;
 	unsigned int len, msgs_received = 0;
 	int err;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	msg = virtqueue_get_buf(rvq, &len);
 	if (!msg) {
@@ -806,6 +810,7 @@ static void rpmsg_xmit_done(struct virtqueue *svq)
 	struct virtproc_info *vrp = svq->vdev->priv;
 
 	dev_dbg(&svq->vdev->dev, "%s\n", __func__);
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	/* wake up potential senders that are waiting for a tx buffer */
 	wake_up_interruptible(&vrp->sendq);
@@ -821,6 +826,7 @@ static int rpmsg_ns_cb(struct rpmsg_device *rpdev, void *data, int len,
 	struct virtproc_info *vrp = priv;
 	struct device *dev = &vrp->vdev->dev;
 	int ret;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 #if defined(CONFIG_DYNAMIC_DEBUG)
 	dynamic_hex_dump("NS announcement: ", DUMP_PREFIX_NONE, 16, 1,
@@ -877,6 +883,7 @@ static int rpmsg_probe(struct virtio_device *vdev)
 	int err = 0, i;
 	size_t total_buf_space;
 	bool notify;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	vrp = kzalloc(sizeof(*vrp), GFP_KERNEL);
 	if (!vrp)
@@ -991,6 +998,7 @@ free_vrp:
 
 static int rpmsg_remove_device(struct device *dev, void *data)
 {
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	device_unregister(dev);
 
 	return 0;
@@ -1001,6 +1009,7 @@ static void rpmsg_remove(struct virtio_device *vdev)
 	struct virtproc_info *vrp = vdev->priv;
 	size_t total_buf_space = vrp->num_bufs * vrp->buf_size;
 	int ret;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	vdev->config->reset(vdev);
 
@@ -1043,6 +1052,7 @@ static struct virtio_driver virtio_ipc_driver = {
 static int __init rpmsg_init(void)
 {
 	int ret;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	ret = register_virtio_driver(&virtio_ipc_driver);
 	if (ret)

@@ -106,6 +106,7 @@ EXPORT_SYMBOL(rpmsg_destroy_ept);
  */
 int rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len)
 {
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	if (WARN_ON(!ept))
 		return -EINVAL;
 	if (!ept->ops->send)
@@ -135,6 +136,7 @@ EXPORT_SYMBOL(rpmsg_send);
  */
 int rpmsg_sendto(struct rpmsg_endpoint *ept, void *data, int len, u32 dst)
 {
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	if (WARN_ON(!ept))
 		return -EINVAL;
 	if (!ept->ops->sendto)
@@ -167,6 +169,7 @@ EXPORT_SYMBOL(rpmsg_sendto);
 int rpmsg_send_offchannel(struct rpmsg_endpoint *ept, u32 src, u32 dst,
 			  void *data, int len)
 {
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	if (WARN_ON(!ept))
 		return -EINVAL;
 	if (!ept->ops->send_offchannel)
@@ -195,6 +198,7 @@ EXPORT_SYMBOL(rpmsg_send_offchannel);
  */
 int rpmsg_trysend(struct rpmsg_endpoint *ept, void *data, int len)
 {
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	if (WARN_ON(!ept))
 		return -EINVAL;
 	if (!ept->ops->trysend)
@@ -223,6 +227,7 @@ EXPORT_SYMBOL(rpmsg_trysend);
  */
 int rpmsg_trysendto(struct rpmsg_endpoint *ept, void *data, int len, u32 dst)
 {
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	if (WARN_ON(!ept))
 		return -EINVAL;
 	if (!ept->ops->trysendto)
@@ -292,6 +297,7 @@ static int rpmsg_device_match(struct device *dev, void *data)
 {
 	struct rpmsg_channel_info *chinfo = data;
 	struct rpmsg_device *rpdev = to_rpmsg_device(dev);
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	if (chinfo->src != RPMSG_ADDR_ANY && chinfo->src != rpdev->src)
 		return 0;
@@ -409,6 +415,7 @@ static int rpmsg_dev_match(struct device *dev, struct device_driver *drv)
 	struct rpmsg_driver *rpdrv = to_rpmsg_driver(drv);
 	const struct rpmsg_device_id *ids = rpdrv->id_table;
 	unsigned int i;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	if (rpdev->driver_override)
 		return !strcmp(rpdev->driver_override, drv->name);
@@ -425,6 +432,7 @@ static int rpmsg_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	struct rpmsg_device *rpdev = to_rpmsg_device(dev);
 	int ret;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	ret = of_device_uevent_modalias(dev, env);
 	if (ret != -ENODEV)
@@ -449,6 +457,7 @@ static int rpmsg_dev_probe(struct device *dev)
 	struct rpmsg_channel_info chinfo = {};
 	struct rpmsg_endpoint *ept = NULL;
 	int err;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	err = dev_pm_domain_attach(dev, true);
 	if (err)
@@ -517,6 +526,7 @@ int rpmsg_register_device(struct rpmsg_device *rpdev)
 {
 	struct device *dev = &rpdev->dev;
 	int ret;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	dev_set_name(&rpdev->dev, "%s.%s.%d.%d", dev_name(dev->parent),
 		     rpdev->id.name, rpdev->src, rpdev->dst);
@@ -541,6 +551,7 @@ int rpmsg_unregister_device(struct device *parent,
 			    struct rpmsg_channel_info *chinfo)
 {
 	struct device *dev;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	dev = rpmsg_find_device(parent, chinfo);
 	if (!dev)
@@ -585,6 +596,7 @@ EXPORT_SYMBOL(unregister_rpmsg_driver);
 static int __init rpmsg_init(void)
 {
 	int ret;
+	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	ret = bus_register(&rpmsg_bus);
 	if (ret)
