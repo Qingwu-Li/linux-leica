@@ -107,6 +107,11 @@ EXPORT_SYMBOL(rpmsg_destroy_ept);
 int rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len)
 {
 	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+
+	pr_err("liqiw rpmsg_endpoint addr=0x%x\n",ept->addr);
+	pr_err("liqiw rpmsg_endpoint src=0x%x\n",ept->rpdev->src);
+	pr_err("liqiw rpmsg_endpoint dst=0x%x\n",ept->rpdev->dst);
+	pr_err("liqiw rpmsg_endpoint name=[%s]\n",ept->rpdev->id.name);
 	if (WARN_ON(!ept))
 		return -EINVAL;
 	if (!ept->ops->send)
@@ -432,7 +437,7 @@ static int rpmsg_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	struct rpmsg_device *rpdev = to_rpmsg_device(dev);
 	int ret;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("liqiw rpmsg %s:%s %d\n",__FILE__,__func__,env->envp_idx);
 
 	ret = of_device_uevent_modalias(dev, env);
 	if (ret != -ENODEV)

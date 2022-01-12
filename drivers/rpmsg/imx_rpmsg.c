@@ -3,6 +3,7 @@
  * Copyright 2019 NXP
  */
 
+#include <linux/slab.h>
 #include <linux/circ_buf.h>
 #include <linux/delay.h>
 #include <linux/err.h>
@@ -97,14 +98,12 @@ struct imx_rpmsg_vq_info {
 static u64 imx_rpmsg_get_features(struct virtio_device *vdev)
 {
 	/* VIRTIO_RPMSG_F_NS has been made private */
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	return 1 << 0;
 }
 
 static int imx_rpmsg_finalize_features(struct virtio_device *vdev)
 {
 	/* Give virtio_ring a chance to accept features */
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 	vring_transport_features(vdev);
 	return 0;
 }
@@ -115,7 +114,7 @@ static bool imx_rpmsg_notify(struct virtqueue *vq)
 	int ret;
 	struct imx_rpmsg_vq_info *rpvq = vq->priv;
 	struct imx_rpmsg_vproc *rpdev = rpvq->rpdev;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	rpvq->mmsg = rpvq->vq_id << 16;
 	/*
@@ -159,14 +158,14 @@ static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
 	struct imx_rpmsg_vq_info *rpvq;
 	struct virtqueue *vq;
 	int err;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	rpvq = kmalloc(sizeof(*rpvq), GFP_KERNEL);
 	if (!rpvq)
 		return ERR_PTR(-ENOMEM);
 
 	/* ioremap'ing normal memory, so we cast away sparse's complaints */
-	rpvq->addr = (__force void *) ioremap_nocache(virdev->vring[index],
+	rpvq->addr = (__force void *) ioremap(virdev->vring[index],
 							RPMSG_RING_SIZE);
 	if (!rpvq->addr) {
 		err = -ENOMEM;
@@ -175,7 +174,7 @@ static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
 
 	memset_io(rpvq->addr, 0, RPMSG_RING_SIZE);
 
-	dev_dbg(dev, "vring%d: phys 0x%x, virt 0x%p\n",
+	dev_err(dev, "vring%d: phys 0x%x, virt 0x%p\n",
 			index, virdev->vring[index], rpvq->addr);
 
 	vq = vring_new_virtqueue(index, RPMSG_NUM_BUFS / 2, RPMSG_VRING_ALIGN,
@@ -208,7 +207,7 @@ free_rpvq:
 static void imx_rpmsg_del_vqs(struct virtio_device *vdev)
 {
 	struct virtqueue *vq, *n;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	list_for_each_entry_safe(vq, n, &vdev->vqs, list) {
 		struct imx_rpmsg_vq_info *rpvq = vq->priv;
@@ -228,7 +227,7 @@ static int imx_rpmsg_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
 {
 	struct imx_virdev *virdev = to_imx_virdev(vdev);
 	int i, err;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	/* we maintain two virtqueues per remote processor (for RX and TX) */
 	if (nvqs != 2)
@@ -253,7 +252,8 @@ error:
 
 static void imx_rpmsg_reset(struct virtio_device *vdev)
 {
-	dev_dbg(&vdev->dev, "reset !\n");
+	pr_err("imx_rpmsg %s \n", __func__);
+	dev_err(&vdev->dev, "reset !\n");
 }
 
 static u8 imx_rpmsg_get_status(struct virtio_device *vdev)
@@ -263,8 +263,8 @@ static u8 imx_rpmsg_get_status(struct virtio_device *vdev)
 
 static void imx_rpmsg_set_status(struct virtio_device *vdev, u8 status)
 {
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
-	dev_dbg(&vdev->dev, "%s new status: %d\n", __func__, status);
+	pr_err("imx_rpmsg %s \n", __func__);
+	dev_err(&vdev->dev, "%s new status: %d\n", __func__, status);
 }
 
 static void imx_rpmsg_vproc_release(struct device *dev)
@@ -301,7 +301,7 @@ static int set_vring_phy_buf(struct platform_device *pdev,
 	resource_size_t size;
 	unsigned int start, end;
 	int i, ret = 0;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	dev_err(&pdev->dev, "%s \n", __func__);
 
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (res) {
@@ -343,7 +343,7 @@ static void rpmsg_work_handler(struct work_struct *work)
 	struct circ_buf *cb = &rpdev->rx_buffer;
 	struct platform_device *pdev = rpdev->pdev;
 	struct device *dev = &pdev->dev;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	spin_lock_irqsave(&rpdev->mu_lock, flags);
 	/* handle all incoming mu message */
@@ -355,7 +355,7 @@ static void rpmsg_work_handler(struct work_struct *work)
 		spin_unlock_irqrestore(&rpdev->mu_lock, flags);
 		virdev = rpdev->ivdev[(message >> 16) / 2];
 
-		dev_dbg(dev, "%s msg: 0x%x\n", __func__, message);
+		dev_err(dev, "%s msg: 0x%x\n", __func__, message);
 		message = message >> 16;
 		message -= virdev->base_vq_id;
 
@@ -440,9 +440,9 @@ static int imx_rpmsg_partition_notify(struct notifier_block *nb,
 static void imx_rpmsg_rxdb_callback(struct mbox_client *c, void *msg)
 {
 	unsigned long flags;
+	pr_err("imx_rpmsg %s \n", __func__);
 	struct imx_rpmsg_vproc *rpdev = container_of(c,
 			struct imx_rpmsg_vproc, cl);
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	spin_lock_irqsave(&rpdev->mu_lock, flags);
 	rpdev->flags |= REMOTE_IS_READY;
@@ -455,11 +455,11 @@ static int imx_rpmsg_rxdb_channel_init(struct imx_rpmsg_vproc *rpdev)
 	struct device *dev = &pdev->dev;
 	struct mbox_client *cl;
 	int ret = 0;
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	cl = &rpdev->cl_rxdb;
 	cl->dev = dev;
 	cl->rx_callback = imx_rpmsg_rxdb_callback;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	/*
 	 * RX door bell is used to receive the ready signal from remote
@@ -468,7 +468,7 @@ static int imx_rpmsg_rxdb_channel_init(struct imx_rpmsg_vproc *rpdev)
 	rpdev->rxdb_ch = mbox_request_channel_byname(cl, "rxdb");
 	if (IS_ERR(rpdev->rxdb_ch)) {
 		ret = PTR_ERR(rpdev->rxdb_ch);
-		dev_dbg(cl->dev, "failed to request mbox chan rxdb, ret %d\n",
+		dev_err(cl->dev, "failed to request mbox chan rxdb, ret %d\n",
 			ret);
 		return ret;
 	}
@@ -480,10 +480,10 @@ static void imx_rpmsg_rx_callback(struct mbox_client *c, void *msg)
 {
 	int buf_space;
 	u32 *data = msg;
+	pr_err("imx_rpmsg %s \n", __func__);
 	struct imx_rpmsg_vproc *rpdev = container_of(c,
 			struct imx_rpmsg_vproc, cl);
 	struct circ_buf *cb = &rpdev->rx_buffer;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	spin_lock(&rpdev->mu_lock);
 	buf_space = CIRC_SPACE(cb->head, cb->tail, PAGE_SIZE);
@@ -508,7 +508,7 @@ static int imx_rpmsg_xtr_channel_init(struct imx_rpmsg_vproc *rpdev)
 	struct device *dev = &pdev->dev;
 	struct mbox_client *cl;
 	int ret = 0;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	cl = &rpdev->cl;
 	cl->dev = dev;
@@ -520,14 +520,14 @@ static int imx_rpmsg_xtr_channel_init(struct imx_rpmsg_vproc *rpdev)
 	rpdev->tx_ch = mbox_request_channel_byname(cl, "tx");
 	if (IS_ERR(rpdev->tx_ch)) {
 		ret = PTR_ERR(rpdev->tx_ch);
-		dev_dbg(cl->dev, "failed to request mbox tx chan, ret %d\n",
+		dev_err(cl->dev, "failed to request mbox tx chan, ret %d\n",
 			ret);
 		goto err_out;
 	}
 	rpdev->rx_ch = mbox_request_channel_byname(cl, "rx");
 	if (IS_ERR(rpdev->rx_ch)) {
 		ret = PTR_ERR(rpdev->rx_ch);
-		dev_dbg(cl->dev, "failed to request mbox rx chan, ret %d\n",
+		dev_err(cl->dev, "failed to request mbox rx chan, ret %d\n",
 			ret);
 		goto err_out;
 	}
@@ -546,11 +546,12 @@ err_out:
 static int imx_rpmsg_probe(struct platform_device *pdev)
 {
 	int j, ret = 0;
+	unsigned long variant;
 	char *buf;
 	struct device *dev = &pdev->dev;
 	struct device_node *np = pdev->dev.of_node;
 	struct imx_rpmsg_vproc *rpdev;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("imx_rpmsg %s \n", __func__);
 
 	buf = devm_kzalloc(dev, PAGE_SIZE, GFP_KERNEL);
 	if (!buf)
@@ -564,7 +565,8 @@ static int imx_rpmsg_probe(struct platform_device *pdev)
 #ifdef CONFIG_IMX_SCU
 	rpdev->proc_nb.notifier_call = imx_rpmsg_partition_notify;
 #endif
-	rpdev->variant = (enum imx_rpmsg_variants)of_device_get_match_data(dev);
+	variant = (uintptr_t)of_device_get_match_data(dev);
+	rpdev->variant = (enum imx_rpmsg_variants)variant;
 	rpdev->rx_buffer.buf = buf;
 	rpdev->rx_buffer.head = 0;
 	rpdev->rx_buffer.tail = 0;
@@ -593,14 +595,14 @@ static int imx_rpmsg_probe(struct platform_device *pdev)
 		goto err_chl;
 	}
 	if (of_reserved_mem_device_init(dev)) {
-		dev_dbg(dev, "dev doesn't have specific DMA pool.\n");
+		dev_err(dev, "dev doesn't have specific DMA pool.\n");
 		rpdev->flags &= (~SPECIFIC_DMA_POOL);
 	} else {
 		rpdev->flags |= SPECIFIC_DMA_POOL;
 	}
 
 	for (j = 0; j < rpdev->vdev_nums; j++) {
-		dev_dbg(dev, "%s rpdev vdev%d: vring0 0x%x, vring1 0x%x\n",
+		dev_err(dev, "%s rpdev vdev%d: vring0 0x%x, vring1 0x%x\n",
 			 __func__, rpdev->vdev_nums,
 			 rpdev->ivdev[j]->vring[0],
 			 rpdev->ivdev[j]->vring[1]);
@@ -676,7 +678,6 @@ static struct platform_driver imx_rpmsg_driver = {
 static int __init imx_rpmsg_init(void)
 {
 	int ret;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
 
 	ret = platform_driver_register(&imx_rpmsg_driver);
 	if (ret)

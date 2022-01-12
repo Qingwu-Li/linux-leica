@@ -561,7 +561,7 @@ static int rpmsg_send_offchannel_raw(struct rpmsg_device *rpdev,
 	struct scatterlist sg;
 	struct rpmsg_hdr *msg;
 	int err;
-	pr_err("liqiw rpmsg %s:%s\n",__FILE__,__func__);
+	pr_err("liqiw rpmsg %s:%s [%s]\n",__FILE__,__func__,data);
 
 	/* bcasting isn't allowed */
 	if (src == RPMSG_ADDR_ANY || dst == RPMSG_ADDR_ANY) {

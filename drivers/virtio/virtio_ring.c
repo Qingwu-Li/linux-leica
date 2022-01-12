@@ -204,6 +204,7 @@ static inline bool virtqueue_use_indirect(struct virtqueue *_vq,
 					  unsigned int total_sg)
 {
 	struct vring_virtqueue *vq = to_vvq(_vq);
+	pr_err("%s \n", __func__);
 
 	/*
 	 * If the host supports indirect descriptor tables, and we have multiple
@@ -240,6 +241,7 @@ static inline bool virtqueue_use_indirect(struct virtqueue *_vq,
 
 static bool vring_use_dma_api(struct virtio_device *vdev)
 {
+	pr_err("%s \n", __func__);
 	if (!virtio_has_iommu_quirk(vdev))
 		return true;
 
@@ -272,6 +274,7 @@ EXPORT_SYMBOL_GPL(virtio_max_dma_size);
 static void *vring_alloc_queue(struct virtio_device *vdev, size_t size,
 			      dma_addr_t *dma_handle, gfp_t flag)
 {
+	pr_err("%s \n", __func__);
 	if (vring_use_dma_api(vdev)) {
 		return dma_alloc_coherent(vdev->dev.parent, size,
 					  dma_handle, flag);
@@ -305,6 +308,7 @@ static void *vring_alloc_queue(struct virtio_device *vdev, size_t size,
 static void vring_free_queue(struct virtio_device *vdev, size_t size,
 			     void *queue, dma_addr_t dma_handle)
 {
+	pr_err("%s \n", __func__);
 	if (vring_use_dma_api(vdev))
 		dma_free_coherent(vdev->dev.parent, size, queue, dma_handle);
 	else
@@ -318,6 +322,7 @@ static void vring_free_queue(struct virtio_device *vdev, size_t size,
  */
 static inline struct device *vring_dma_dev(const struct vring_virtqueue *vq)
 {
+	pr_err("%s \n", __func__);
 	return vq->vq.vdev->dev.parent;
 }
 
@@ -326,6 +331,7 @@ static dma_addr_t vring_map_one_sg(const struct vring_virtqueue *vq,
 				   struct scatterlist *sg,
 				   enum dma_data_direction direction)
 {
+	pr_err("%s \n", __func__);
 	if (!vq->use_dma_api)
 		return (dma_addr_t)sg_phys(sg);
 
@@ -343,6 +349,7 @@ static dma_addr_t vring_map_single(const struct vring_virtqueue *vq,
 				   void *cpu_addr, size_t size,
 				   enum dma_data_direction direction)
 {
+	pr_err("%s \n", __func__);
 	if (!vq->use_dma_api)
 		return (dma_addr_t)virt_to_phys(cpu_addr);
 
@@ -353,6 +360,7 @@ static dma_addr_t vring_map_single(const struct vring_virtqueue *vq,
 static int vring_mapping_error(const struct vring_virtqueue *vq,
 			       dma_addr_t addr)
 {
+	pr_err("%s \n", __func__);
 	if (!vq->use_dma_api)
 		return 0;
 
@@ -367,6 +375,7 @@ static int vring_mapping_error(const struct vring_virtqueue *vq,
 static void vring_unmap_one_split(const struct vring_virtqueue *vq,
 				  struct vring_desc *desc)
 {
+	pr_err("%s \n", __func__);
 	u16 flags;
 
 	if (!vq->use_dma_api)
@@ -393,6 +402,7 @@ static struct vring_desc *alloc_indirect_split(struct virtqueue *_vq,
 					       unsigned int total_sg,
 					       gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	struct vring_desc *desc;
 	unsigned int i;
 
@@ -421,6 +431,7 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
 				      void *ctx,
 				      gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	struct scatterlist *sg;
 	struct vring_desc *desc;
@@ -465,7 +476,7 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
 	}
 
 	if (vq->vq.num_free < descs_used) {
-		pr_debug("Can't add buf len %i - avail = %i\n",
+		pr_err("Can't add buf len %i - avail = %i\n",
 			 descs_used, vq->vq.num_free);
 		/* FIXME: for historical reasons, we force a notify here if
 		 * there are outgoing parts to the buffer.  Presumably the
@@ -554,7 +565,7 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
 						vq->split.avail_idx_shadow);
 	vq->num_added++;
 
-	pr_debug("Added buffer head %i to %p\n", head, vq);
+	pr_err("Added buffer head %i to %p\n", head, vq);
 	END_USE(vq);
 
 	/* This is very unlikely, but theoretically possible.  Kick
@@ -588,6 +599,7 @@ unmap_release:
 
 static bool virtqueue_kick_prepare_split(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	u16 new, old;
 	bool needs_kick;
@@ -620,6 +632,7 @@ static bool virtqueue_kick_prepare_split(struct virtqueue *_vq)
 static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
 			     void **ctx)
 {
+	pr_err("%s \n", __func__);
 	unsigned int i, j;
 	__virtio16 nextflag = cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F_NEXT);
 
@@ -671,6 +684,7 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
 
 static inline bool more_used_split(const struct vring_virtqueue *vq)
 {
+	pr_err("%s \n", __func__);
 	return vq->last_used_idx != virtio16_to_cpu(vq->vq.vdev,
 			vq->split.vring.used->idx);
 }
@@ -679,6 +693,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
 					 unsigned int *len,
 					 void **ctx)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	void *ret;
 	unsigned int i;
@@ -692,7 +707,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
 	}
 
 	if (!more_used_split(vq)) {
-		pr_debug("No more buffers in queue\n");
+		pr_err("No more buffers in queue\n");
 		END_USE(vq);
 		return NULL;
 	}
@@ -735,6 +750,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
 
 static void virtqueue_disable_cb_split(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (!(vq->split.avail_flags_shadow & VRING_AVAIL_F_NO_INTERRUPT)) {
@@ -748,6 +764,7 @@ static void virtqueue_disable_cb_split(struct virtqueue *_vq)
 
 static unsigned virtqueue_enable_cb_prepare_split(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	u16 last_used_idx;
 
@@ -773,6 +790,7 @@ static unsigned virtqueue_enable_cb_prepare_split(struct virtqueue *_vq)
 
 static bool virtqueue_poll_split(struct virtqueue *_vq, unsigned last_used_idx)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return (u16)last_used_idx != virtio16_to_cpu(_vq->vdev,
@@ -781,6 +799,7 @@ static bool virtqueue_poll_split(struct virtqueue *_vq, unsigned last_used_idx)
 
 static bool virtqueue_enable_cb_delayed_split(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	u16 bufs;
 
@@ -817,6 +836,7 @@ static bool virtqueue_enable_cb_delayed_split(struct virtqueue *_vq)
 
 static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	unsigned int i;
 	void *buf;
@@ -854,6 +874,7 @@ static struct virtqueue *vring_create_virtqueue_split(
 	void (*callback)(struct virtqueue *),
 	const char *name)
 {
+	pr_err("%s \n", __func__);
 	struct virtqueue *vq;
 	void *queue = NULL;
 	dma_addr_t dma_addr;
@@ -914,6 +935,7 @@ static struct virtqueue *vring_create_virtqueue_split(
 static void vring_unmap_state_packed(const struct vring_virtqueue *vq,
 				     struct vring_desc_extra_packed *state)
 {
+	pr_err("%s \n", __func__);
 	u16 flags;
 
 	if (!vq->use_dma_api)
@@ -937,6 +959,7 @@ static void vring_unmap_state_packed(const struct vring_virtqueue *vq,
 static void vring_unmap_desc_packed(const struct vring_virtqueue *vq,
 				   struct vring_packed_desc *desc)
 {
+	pr_err("%s \n", __func__);
 	u16 flags;
 
 	if (!vq->use_dma_api)
@@ -984,6 +1007,7 @@ static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
 				       void *data,
 				       gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	struct vring_packed_desc *desc;
 	struct scatterlist *sg;
 	unsigned int i, n, err_idx;
@@ -994,7 +1018,7 @@ static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
 	desc = alloc_indirect_packed(total_sg, gfp);
 
 	if (unlikely(vq->vq.num_free < 1)) {
-		pr_debug("Can't add buf len 1 - avail = 0\n");
+		pr_err("Can't add buf len 1 - avail = 0\n");
 		kfree(desc);
 		END_USE(vq);
 		return -ENOSPC;
@@ -1071,7 +1095,7 @@ static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
 
 	vq->num_added += 1;
 
-	pr_debug("Added buffer head %i to %p\n", head, vq);
+	pr_err("Added buffer head %i to %p\n", head, vq);
 	END_USE(vq);
 
 	return 0;
@@ -1097,6 +1121,7 @@ static inline int virtqueue_add_packed(struct virtqueue *_vq,
 				       void *ctx,
 				       gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	struct vring_packed_desc *desc;
 	struct scatterlist *sg;
@@ -1132,7 +1157,7 @@ static inline int virtqueue_add_packed(struct virtqueue *_vq,
 	descs_used = total_sg;
 
 	if (unlikely(vq->vq.num_free < descs_used)) {
-		pr_debug("Can't add buf len %i - avail = %i\n",
+		pr_err("Can't add buf len %i - avail = %i\n",
 			 descs_used, vq->vq.num_free);
 		END_USE(vq);
 		return -ENOSPC;
@@ -1205,7 +1230,7 @@ static inline int virtqueue_add_packed(struct virtqueue *_vq,
 	vq->packed.vring.desc[head].flags = head_flags;
 	vq->num_added += descs_used;
 
-	pr_debug("Added buffer head %i to %p\n", head, vq);
+	pr_err("Added buffer head %i to %p\n", head, vq);
 	END_USE(vq);
 
 	return 0;
@@ -1231,6 +1256,7 @@ unmap_release:
 
 static bool virtqueue_kick_prepare_packed(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	u16 new, old, off_wrap, flags, wrap_counter, event_idx;
 	bool needs_kick;
@@ -1281,6 +1307,7 @@ out:
 static void detach_buf_packed(struct vring_virtqueue *vq,
 			      unsigned int id, void **ctx)
 {
+	pr_err("%s \n", __func__);
 	struct vring_desc_state_packed *state = NULL;
 	struct vring_packed_desc *desc;
 	unsigned int i, curr;
@@ -1327,6 +1354,7 @@ static void detach_buf_packed(struct vring_virtqueue *vq,
 static inline bool is_used_desc_packed(const struct vring_virtqueue *vq,
 				       u16 idx, bool used_wrap_counter)
 {
+	pr_err("%s \n", __func__);
 	bool avail, used;
 	u16 flags;
 
@@ -1347,6 +1375,7 @@ static void *virtqueue_get_buf_ctx_packed(struct virtqueue *_vq,
 					  unsigned int *len,
 					  void **ctx)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	u16 last_used, id;
 	void *ret;
@@ -1359,7 +1388,7 @@ static void *virtqueue_get_buf_ctx_packed(struct virtqueue *_vq,
 	}
 
 	if (!more_used_packed(vq)) {
-		pr_debug("No more buffers in queue\n");
+		pr_err("No more buffers in queue\n");
 		END_USE(vq);
 		return NULL;
 	}
@@ -1410,6 +1439,7 @@ static void *virtqueue_get_buf_ctx_packed(struct virtqueue *_vq,
 
 static void virtqueue_disable_cb_packed(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (vq->packed.event_flags_shadow != VRING_PACKED_EVENT_FLAG_DISABLE) {
@@ -1421,6 +1451,7 @@ static void virtqueue_disable_cb_packed(struct virtqueue *_vq)
 
 static unsigned virtqueue_enable_cb_prepare_packed(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	START_USE(vq);
@@ -1457,6 +1488,7 @@ static unsigned virtqueue_enable_cb_prepare_packed(struct virtqueue *_vq)
 
 static bool virtqueue_poll_packed(struct virtqueue *_vq, u16 off_wrap)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	bool wrap_counter;
 	u16 used_idx;
@@ -1469,6 +1501,7 @@ static bool virtqueue_poll_packed(struct virtqueue *_vq, u16 off_wrap)
 
 static bool virtqueue_enable_cb_delayed_packed(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	u16 used_idx, wrap_counter;
 	u16 bufs;
@@ -1528,6 +1561,7 @@ static bool virtqueue_enable_cb_delayed_packed(struct virtqueue *_vq)
 
 static void *virtqueue_detach_unused_buf_packed(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 	unsigned int i;
 	void *buf;
@@ -1562,6 +1596,7 @@ static struct virtqueue *vring_create_virtqueue_packed(
 	void (*callback)(struct virtqueue *),
 	const char *name)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq;
 	struct vring_packed_desc *ring;
 	struct vring_packed_desc_event *driver, *device;
@@ -1699,6 +1734,7 @@ static inline int virtqueue_add(struct virtqueue *_vq,
 				void *ctx,
 				gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return vq->packed_ring ? virtqueue_add_packed(_vq, sgs, total_sg,
@@ -1728,6 +1764,7 @@ int virtqueue_add_sgs(struct virtqueue *_vq,
 		      void *data,
 		      gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	unsigned int i, total_sg = 0;
 
 	/* Count them first. */
@@ -1760,6 +1797,7 @@ int virtqueue_add_outbuf(struct virtqueue *vq,
 			 void *data,
 			 gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	return virtqueue_add(vq, &sg, num, 1, 0, data, NULL, gfp);
 }
 EXPORT_SYMBOL_GPL(virtqueue_add_outbuf);
@@ -1782,6 +1820,7 @@ int virtqueue_add_inbuf(struct virtqueue *vq,
 			void *data,
 			gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	return virtqueue_add(vq, &sg, num, 0, 1, data, NULL, gfp);
 }
 EXPORT_SYMBOL_GPL(virtqueue_add_inbuf);
@@ -1806,6 +1845,7 @@ int virtqueue_add_inbuf_ctx(struct virtqueue *vq,
 			void *ctx,
 			gfp_t gfp)
 {
+	pr_err("%s \n", __func__);
 	return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, gfp);
 }
 EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_ctx);
@@ -1823,6 +1863,7 @@ EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_ctx);
  */
 bool virtqueue_kick_prepare(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return vq->packed_ring ? virtqueue_kick_prepare_packed(_vq) :
@@ -1840,6 +1881,7 @@ EXPORT_SYMBOL_GPL(virtqueue_kick_prepare);
  */
 bool virtqueue_notify(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (unlikely(vq->broken))
@@ -1868,6 +1910,7 @@ EXPORT_SYMBOL_GPL(virtqueue_notify);
  */
 bool virtqueue_kick(struct virtqueue *vq)
 {
+	pr_err("%s \n", __func__);
 	if (virtqueue_kick_prepare(vq))
 		return virtqueue_notify(vq);
 	return true;
@@ -1894,6 +1937,7 @@ EXPORT_SYMBOL_GPL(virtqueue_kick);
 void *virtqueue_get_buf_ctx(struct virtqueue *_vq, unsigned int *len,
 			    void **ctx)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return vq->packed_ring ? virtqueue_get_buf_ctx_packed(_vq, len, ctx) :
@@ -1903,6 +1947,7 @@ EXPORT_SYMBOL_GPL(virtqueue_get_buf_ctx);
 
 void *virtqueue_get_buf(struct virtqueue *_vq, unsigned int *len)
 {
+	pr_err("%s \n", __func__);
 	return virtqueue_get_buf_ctx(_vq, len, NULL);
 }
 EXPORT_SYMBOL_GPL(virtqueue_get_buf);
@@ -1917,6 +1962,7 @@ EXPORT_SYMBOL_GPL(virtqueue_get_buf);
  */
 void virtqueue_disable_cb(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (vq->packed_ring)
@@ -1940,6 +1986,7 @@ EXPORT_SYMBOL_GPL(virtqueue_disable_cb);
  */
 unsigned virtqueue_enable_cb_prepare(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return vq->packed_ring ? virtqueue_enable_cb_prepare_packed(_vq) :
@@ -1958,6 +2005,7 @@ EXPORT_SYMBOL_GPL(virtqueue_enable_cb_prepare);
  */
 bool virtqueue_poll(struct virtqueue *_vq, unsigned last_used_idx)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (unlikely(vq->broken))
@@ -1982,6 +2030,7 @@ EXPORT_SYMBOL_GPL(virtqueue_poll);
  */
 bool virtqueue_enable_cb(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	unsigned last_used_idx = virtqueue_enable_cb_prepare(_vq);
 
 	return !virtqueue_poll(_vq, last_used_idx);
@@ -2003,6 +2052,7 @@ EXPORT_SYMBOL_GPL(virtqueue_enable_cb);
  */
 bool virtqueue_enable_cb_delayed(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return vq->packed_ring ? virtqueue_enable_cb_delayed_packed(_vq) :
@@ -2020,6 +2070,7 @@ EXPORT_SYMBOL_GPL(virtqueue_enable_cb_delayed);
  */
 void *virtqueue_detach_unused_buf(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return vq->packed_ring ? virtqueue_detach_unused_buf_packed(_vq) :
@@ -2029,22 +2080,24 @@ EXPORT_SYMBOL_GPL(virtqueue_detach_unused_buf);
 
 static inline bool more_used(const struct vring_virtqueue *vq)
 {
+	pr_err("%s \n", __func__);
 	return vq->packed_ring ? more_used_packed(vq) : more_used_split(vq);
 }
 
 irqreturn_t vring_interrupt(int irq, void *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (!more_used(vq)) {
-		pr_debug("virtqueue interrupt with no work for %p\n", vq);
+		pr_err("virtqueue interrupt with no work for %p\n", vq);
 		return IRQ_NONE;
 	}
 
 	if (unlikely(vq->broken))
 		return IRQ_HANDLED;
 
-	pr_debug("virtqueue callback for %p (%p)\n", vq, vq->vq.callback);
+	pr_err("virtqueue callback for %p (%p)\n", vq, vq->vq.callback);
 	if (vq->vq.callback)
 		vq->vq.callback(&vq->vq);
 
@@ -2062,6 +2115,7 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
 					void (*callback)(struct virtqueue *),
 					const char *name)
 {
+	pr_err("%s \n", __func__);
 	unsigned int i;
 	struct vring_virtqueue *vq;
 
@@ -2143,6 +2197,7 @@ struct virtqueue *vring_create_virtqueue(
 	void (*callback)(struct virtqueue *),
 	const char *name)
 {
+	pr_err("%s \n", __func__);
 
 	if (virtio_has_feature(vdev, VIRTIO_F_RING_PACKED))
 		return vring_create_virtqueue_packed(index, num, vring_align,
@@ -2167,6 +2222,7 @@ struct virtqueue *vring_new_virtqueue(unsigned int index,
 				      void (*callback)(struct virtqueue *vq),
 				      const char *name)
 {
+	pr_err("%s \n", __func__);
 	struct vring vring;
 
 	if (virtio_has_feature(vdev, VIRTIO_F_RING_PACKED))
@@ -2180,6 +2236,7 @@ EXPORT_SYMBOL_GPL(vring_new_virtqueue);
 
 void vring_del_virtqueue(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	if (vq->we_own_ring) {
@@ -2218,6 +2275,7 @@ EXPORT_SYMBOL_GPL(vring_del_virtqueue);
 /* Manipulates transport-specific feature bits. */
 void vring_transport_features(struct virtio_device *vdev)
 {
+	pr_err("%s \n", __func__);
 	unsigned int i;
 
 	for (i = VIRTIO_TRANSPORT_F_START; i < VIRTIO_TRANSPORT_F_END; i++) {
@@ -2251,6 +2309,7 @@ EXPORT_SYMBOL_GPL(vring_transport_features);
  */
 unsigned int virtqueue_get_vring_size(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
@@ -2260,6 +2319,7 @@ EXPORT_SYMBOL_GPL(virtqueue_get_vring_size);
 
 bool virtqueue_is_broken(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	return vq->broken;
@@ -2272,6 +2332,7 @@ EXPORT_SYMBOL_GPL(virtqueue_is_broken);
  */
 void virtio_break_device(struct virtio_device *dev)
 {
+	pr_err("%s \n", __func__);
 	struct virtqueue *_vq;
 
 	list_for_each_entry(_vq, &dev->vqs, list) {
@@ -2283,6 +2344,7 @@ EXPORT_SYMBOL_GPL(virtio_break_device);
 
 dma_addr_t virtqueue_get_desc_addr(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	BUG_ON(!vq->we_own_ring);
@@ -2296,6 +2358,7 @@ EXPORT_SYMBOL_GPL(virtqueue_get_desc_addr);
 
 dma_addr_t virtqueue_get_avail_addr(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	BUG_ON(!vq->we_own_ring);
@@ -2310,6 +2373,7 @@ EXPORT_SYMBOL_GPL(virtqueue_get_avail_addr);
 
 dma_addr_t virtqueue_get_used_addr(struct virtqueue *_vq)
 {
+	pr_err("%s \n", __func__);
 	struct vring_virtqueue *vq = to_vvq(_vq);
 
 	BUG_ON(!vq->we_own_ring);
@@ -2325,6 +2389,7 @@ EXPORT_SYMBOL_GPL(virtqueue_get_used_addr);
 /* Only available for split ring */
 const struct vring *virtqueue_get_vring(struct virtqueue *vq)
 {
+	pr_err("%s \n", __func__);
 	return &to_vvq(vq)->split.vring;
 }
 EXPORT_SYMBOL_GPL(virtqueue_get_vring);
