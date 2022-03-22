@@ -435,6 +435,13 @@ static const struct bmi088_accel_chip_info bmi088_accel_chip_info_tbl[] = {
 		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
 		.scale_table = {897, 1795, 3590, 7179},
 	},
+	[1] = {
+		.name = "bmi085a",
+		.chip_id = 0x1F,
+		.channels = bmi088_accel_channels,
+		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
+		.scale_table = {598, 1196, 2393, 4785},
+	},
 };
 
 static const struct iio_info bmi088_accel_info = {
