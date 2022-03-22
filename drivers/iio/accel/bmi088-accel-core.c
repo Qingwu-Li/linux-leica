@@ -429,21 +429,21 @@ static const struct iio_chan_spec bmi088_accel_channels[] = {
 
 static const struct bmi088_accel_chip_info bmi088_accel_chip_info_tbl[] = {
 	[0] = {
-		.name = "bmi088a",
+		.name = "bmi088-accel",
 		.chip_id = 0x1E,
 		.channels = bmi088_accel_channels,
 		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
 		.scale_table = {897, 1795, 3590, 7179},
 	},
 	[1] = {
-		.name = "bmi085a",
+		.name = "bmi085-accel",
 		.chip_id = 0x1F,
 		.channels = bmi088_accel_channels,
 		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
 		.scale_table = {598, 1196, 2393, 4785},
 	},
 	[2] = {
-		.name = "bmi090la",
+		.name = "bmi090l-accel",
 		.chip_id = 0x1A,
 		.channels = bmi088_accel_channels,
 		.num_channels = ARRAY_SIZE(bmi088_accel_channels),
@@ -529,7 +529,7 @@ int bmi088_accel_core_probe(struct device *dev, struct regmap *regmap,
 
 	indio_dev->channels = data->chip_info->channels;
 	indio_dev->num_channels = data->chip_info->num_channels;
-	indio_dev->name = name ? name : data->chip_info->name;
+	indio_dev->name = data->chip_info->name;
 	indio_dev->available_scan_masks = bmi088_accel_scan_masks;
 	indio_dev->modes = INDIO_DIRECT_MODE;
 	indio_dev->info = &bmi088_accel_info;
