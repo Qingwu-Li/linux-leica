@@ -93,12 +93,17 @@ static const struct iio_chan_spec sca3300_channels[] = {
 };
 
 static const int sca3300_freq_tbl[] = {70, 10};
+static const int scl3300_freq_tbl[] = {40, 70, 10};
 static const int sca3300_freq_modes_map[] = {0, 0, 0, 1};
+static const int scl3300_freq_modes_map[] = {0, 1, 2};
 
 static const int sca3300_accel_scale_tbl[][2] = {{0, 370}, {0, 741}, {0, 185}};
+static const int scl3300_accel_scale_tbl[][2] = {{0, 167}, {0, 333}, {0, 83}};
 static const int sca3300_accel_scale_modes_map[] = {0, 1, 2, 2};
+static const int scl3300_accel_scale_modes_map[] = {0, 1, 2};
 
 static const int sca3300_avail_modes_map[] = {0, 1, 2, 3};
+static const int scl3300_avail_modes_map[] = {0, 1, 3};
 static const unsigned long sca3300_scan_masks[] = {
 	BIT(SCA3300_ACC_X) | BIT(SCA3300_ACC_Y) | BIT(SCA3300_ACC_Z) |
 	BIT(SCA3300_TEMP),
@@ -155,6 +160,20 @@ static const struct sca3300_chip_info sca3300_chip_tbl[] = {
 		.name = "sca3300",
 		.chip_id = 0x51,
 		.num_freqs = 2,
+	},
+	{	.num_accel_scales = ARRAY_SIZE(scl3300_accel_scale_tbl)*2,
+		.accel_scale_modes_map = scl3300_accel_scale_modes_map,
+		.accel_scale_table = scl3300_accel_scale_tbl,
+		.num_channels = ARRAY_SIZE(sca3300_channels),
+		.avail_modes_table = scl3300_avail_modes_map,
+		.freq_modes_map = scl3300_freq_modes_map,
+		.scan_masks = sca3300_scan_masks,
+		.freq_table = scl3300_freq_tbl,
+		.channels = sca3300_channels,
+		.num_avail_modes = 3,
+		.name = "scl3300",
+		.chip_id = 0xC1,
+		.num_freqs = 3,
 	},
 };
 
@@ -558,6 +577,7 @@ static int sca3300_probe(struct spi_device *spi)
 
 static const struct of_device_id sca3300_dt_ids[] = {
 	{ .compatible = "murata,sca3300"},
+	{ .compatible = "murata,scl3300"},
 	{}
 };
 MODULE_DEVICE_TABLE(of, sca3300_dt_ids);
