@@ -61,6 +61,7 @@ static int bmi088_accel_remove(struct spi_device *spi)
 
 static const struct spi_device_id bmi088_accel_id[] = {
 	{"bmi088-accel", },
+	{"bmi085-accel", },
 	{}
 };
 MODULE_DEVICE_TABLE(spi, bmi088_accel_id);
