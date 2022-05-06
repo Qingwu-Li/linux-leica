@@ -42,7 +42,6 @@ static struct regmap_bus bmi088_regmap_bus = {
 static int bmi088_accel_probe(struct spi_device *spi)
 {
 	struct regmap *regmap;
-	const struct spi_device_id *id = spi_get_device_id(spi);
 
 	regmap = devm_regmap_init(&spi->dev, &bmi088_regmap_bus,
 			spi, &bmi088_regmap_conf);
@@ -52,8 +51,7 @@ static int bmi088_accel_probe(struct spi_device *spi)
 		return PTR_ERR(regmap);
 	}
 
-	return bmi088_accel_core_probe(&spi->dev, regmap, spi->irq, id->name,
-				       true);
+	return bmi088_accel_core_probe(&spi->dev, regmap, spi->irq, true);
 }
 
 static int bmi088_accel_remove(struct spi_device *spi)
