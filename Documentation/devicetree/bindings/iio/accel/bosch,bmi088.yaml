@@ -18,6 +18,8 @@ properties:
   compatible:
     enum:
       - bosch,bmi088-accel
+      - bosch,bmi085-accel
+      - bosch,bmi090l-accel
 
   reg:
     maxItems: 1
