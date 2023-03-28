@@ -158,6 +158,40 @@
 		reg = <0x57>;
 		pagesize = <16>;
 	};
+
+	tca6424a: gpio-controller@22 {
+		compatible = "ti,tca6424";
+		reg = <0x22>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_io_expdr>;
+		interrupt-controller;
+		reset-gpios = <&gpio4 4 GPIO_ACTIVE_LOW>;
+		gpio-line-names = "", "", "",
+			"TD_GPIO",
+			"IMX_VBUS_EN","", "",
+			"IMX_TILT_PWR_EN",
+
+			"KDU_POWER_ONOFF",
+			"IMX_KDU1_LVDS_EN",
+			"IMX_KDU2_LVDS_EN",
+			"IMX_KDI_xRST",
+			"TD_PRESENT",
+			"IMX_EXTT_EN",
+			"IMX_FPGA_SW_nRST",
+			"IMX_FPGA_SPARE_GPIO_DIR",
+
+			"IMX_WLESS_EN",
+			"IMX_WLESS_nPD",
+			"IMX_WLESS_WL_xRST",
+			"IMX_WLESS_BT_xRST",
+			"IMX_TSR_xRST",
+			"IMX_AUD_xINT",
+			"IMX_AUD_xRST",	"";
+	};
 };
 
 &i2c4 {
@@ -217,6 +251,13 @@
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C1_SCL__I2C1_SCL		0x400001c2 /*I2C1_SCL */
 			MX8MP_IOMUXC_I2C1_SDA__I2C1_SDA		0x400001c2 /*I2C1_SDA */
+		>;
+	};
+
+	pinctrl_io_expdr: pca6416_int_grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_HDMI_DDC_SCL__GPIO3_IO26	0x146 /*IMX_IO_EXPDR_xINT */
+			MX8MP_IOMUXC_SAI1_RXD2__GPIO4_IO04	0x106 /*IMX_IO_EXPDR_xRST */
 		>;
 	};
 
