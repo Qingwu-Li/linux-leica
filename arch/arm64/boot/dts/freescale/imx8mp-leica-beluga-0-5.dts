@@ -22,6 +22,13 @@
 		reg = <0x0 0x40000000 0 0xc0000000>,
 		      <0x1 0x00000000 0 0xc0000000>;
 	};
+
+	/* 25MHz crystal for PCIe REFCLK Generator */
+	clk_xtal25: clk-xtal25 {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <25000000>;
+	};
 };
 
 &A53_0 {
@@ -130,6 +137,13 @@
 		reg = <0x32>;
 		aux-voltage-chargeable = <0>;
 		wakeup-source;
+	};
+
+	pcieclk: clk@68 {
+		compatible = "renesas,9fgv0241";
+		reg = <0x68>;
+		clocks = <&clk_xtal25>;
+		#clock-cells = <1>;
 	};
 };
 
