@@ -230,6 +230,25 @@
 	pinctrl-0 = <&pinctrl_i2c6>;
 	clock-frequency = <400000>;
 	status = "okay";
+
+	tmp116@48 {
+		compatible = "ti,tmp116";
+		reg = <0x48>;
+		label = "ProcessorBoard:1";
+	};
+
+	tmp116@49 {
+		compatible = "ti,tmp116";
+		reg = <0x49>;
+		label = "ProcessorBoard:2";
+	};
+
+	tmp116@4A {
+		vcc-supply = <&reg_ext_vdd_3v3>;
+		compatible = "ti,tmp116";
+		reg = <0x4A>;
+		label = "External:1";
+	};
 };
 
 &snvs_pwrkey {
