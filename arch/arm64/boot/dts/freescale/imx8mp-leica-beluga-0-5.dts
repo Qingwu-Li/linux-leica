@@ -318,7 +318,82 @@
 	};
 };
 
+&gpio2 {
+	gpio-line-names =
+		"", "",
+		"PMIC_IRQ_B",				/* GPIO2_IO02 */
+		"IMX_FPGA_PCIe_xRST",			/* GPIO2_IO03 */
+		"","", "",
+		"FPGA_IMX_SYNC",			/* GPIO2_IO07 */
+		"EFI_CPU_SHDWN",			/* GPIO2_IO08 */
+		"","",
+		"IMX_CPU_READY",			/* GPIO2_IO11 */
+		"", "", "","", "", "", "", "",
+		"";
+};
+
+&gpio3 {
+	gpio-line-names =
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "",
+		"IMX_CTS1_xIRQ",			/* GPIO3_IO23 */
+		"IMX_CTS2_xIRQ",			/* GPIO3_IO24 */
+		"",
+		"IMX_IO_EXPDR_xINT",			/* GPIO3_IO26 */
+		"EFI_IMX_SPARE",			/* GPIO3_IO27 */
+		"IMX_KDI2_IRQ",				/* GPIO3_IO28 */
+		"IMX_KDI1_IRQ";				/* GPIO3_IO29 */
+
+};
+
+&gpio4 {
+	gpio-line-names =
+		"TD_PPS",				/* GPIO4_IO00 */
+		"", "", "",
+		"IMX_IO_EXPDR_xRST",			/* GPIO4_IO04 */
+		"IMX_HUB_xRST",				/* GPIO4_IO05 */
+		"", "",
+		"IMX_EN_EXT_VDD",			/* GPIO4_IO08 */
+		"IMX_TPM_LP",				/* GPIO4_IO09 */
+		"", "",
+		"IMX_USBCC_CTRL_xINT",			/* GPIO4_IO12 */
+		"IMX_VBUS_xALRT",			/* GPIO4_IO13 */
+		"",
+		"TPM_IMX_xIRQ",				/* GPIO4_IO15 */
+		"", "",
+		"IMX_FPGA_BT_SYNC",			/* GPIO4_IO18 */
+		"", "",
+		"IMX_SDIO2_INT",			/* GPIO4_IO21 */
+		"IMX_SPI3_xCS1",			/* GPIO4_IO22 */
+		"", "", "", "", "", "",
+		"IMX_FPGA_PROG_EN",			/* GPIO4_IO29 */
+		"IMX_SPI3_xCS0_BK",			/* GPIO4_IO30 */
+		"FPGA_IMX_IRQ";				/* GPIO4_IO31 */
+};
+
 &iomuxc {
+	pinctrl_gpio: gpiogrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD1_DATA1__GPIO2_IO03	0x106	/* IMX_FPGA_PCIe_xRST */
+			MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07	0x106	/* FPGA_IMX_SYNC */
+			MX8MP_IOMUXC_SD1_DATA6__GPIO2_IO08	0x106	/* EFI_CPU_SHDWN */
+			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11	0x106	/* IMX_CPU_READY */
+			MX8MP_IOMUXC_SAI5_RXD2__GPIO3_IO23	0x106	/* IMX_CTS1_xIRQ */
+			MX8MP_IOMUXC_SAI5_RXD3__GPIO3_IO24	0x106	/* IMX_CTS2_xIRQ */
+			MX8MP_IOMUXC_HDMI_DDC_SDA__GPIO3_IO27	0x106	/* EFI_IMX_SPARE */
+			MX8MP_IOMUXC_HDMI_CEC__GPIO3_IO28	0x106	/* IMX_KDI2_IRQ */
+			MX8MP_IOMUXC_HDMI_HPD__GPIO3_IO29	0x106	/* IMX_KDI1_IRQ */
+			MX8MP_IOMUXC_SAI1_RXFS__GPIO4_IO00	0x106	/* TD_PPS */
+			MX8MP_IOMUXC_SAI1_RXD7__GPIO4_IO09	0x106	/* IMX_TPM_LP */
+			MX8MP_IOMUXC_SAI1_RXD3__GPIO4_IO05	0x106	/*IMX_HUB_xRST */
+			MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21	0x106	/* IMX_SDIO2_INT */
+			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29	0x106	/* IMX_FPGA_PROG_EN */
+			MX8MP_IOMUXC_SAI3_TXFS__GPIO4_IO31	0x106	/* FPGA_IMX_IRQ */
+			MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18	0x106	/* IMX_FPGA_BT_SYNC */
+		>;
+	};
+
 	pinctrl_i2c1: i2c1grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C1_SCL__I2C1_SCL		0x400001c2 /*I2C1_SCL */
