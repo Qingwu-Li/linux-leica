@@ -29,6 +29,23 @@
 		#clock-cells = <0>;
 		clock-frequency = <25000000>;
 	};
+
+	/*
+	 *ext_vdd_3v3
+	 *KDU 1 & 2
+	 *Knob 1, 2 & 3
+	 *Ext T. Sensor
+	 */
+	reg_ext_vdd_3v3: regulator_ext_vdd_3v3 {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_ext_vdd_3v3>;
+		regulator-name = "VDD_3V3_EXT";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio4 8 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
 };
 
 &A53_0 {
@@ -246,6 +263,22 @@
 	status = "okay";
 };
 
+&flexspi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexspi>;
+	status = "okay";
+
+	flash0: mt25qu256aba@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <80000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+	};
+};
+
 &iomuxc {
 	pinctrl_i2c1: i2c1grp {
 		fsl,pins = <
@@ -354,5 +387,23 @@
 			MX8MP_IOMUXC_SAI5_RXFS__I2C6_SCL	0x400001c2 /*I2C6_SCL */
 			MX8MP_IOMUXC_SAI5_RXC__I2C6_SDA		0x400001c2 /*I2C6_SDA */
 			>;
+	};
+
+	pinctrl_reg_ext_vdd_3v3: reg_ext_vdd_3v3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_RXD6__GPIO4_IO08		0x106 /*IMX_EN_EXT_VDD */
+		>;
+	};
+
+	pinctrl_flexspi: qspigrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_NAND_ALE__FLEXSPI_A_SCLK		0x1c2 /*QSPIA_SCLK */
+			MX8MP_IOMUXC_NAND_CE0_B__FLEXSPI_A_SS0_B	0x82 /*QSPIA_xSS0 */
+			MX8MP_IOMUXC_NAND_DATA00__FLEXSPI_A_DATA00	0x82 /*QSPIA_DATA0 */
+			MX8MP_IOMUXC_NAND_DATA01__FLEXSPI_A_DATA01	0x82 /*QSPIA_DATA1 */
+			MX8MP_IOMUXC_NAND_DATA02__FLEXSPI_A_DATA02	0x82 /*QSPIA_DATA2 */
+			MX8MP_IOMUXC_NAND_DATA03__FLEXSPI_A_DATA03	0x82 /*QSPIA_DATA3 */
+			MX8MP_IOMUXC_NAND_DQS__FLEXSPI_A_DQS		0x82 /*QSPIA_DQS */
+		>;
 	};
 };
