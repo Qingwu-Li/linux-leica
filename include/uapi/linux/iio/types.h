@@ -120,6 +120,9 @@ enum iio_event_type {
 	IIO_EV_TYPE_MAG_REFERENCED,
 	IIO_EV_TYPE_GESTURE,
 	IIO_EV_TYPE_FAULT,
+	IIO_EV_TYPE_THRESH2,
+	IIO_EV_TYPE_THRESH3,
+	IIO_EV_TYPE_THRESH4,
 };
 
 enum iio_event_direction {

@@ -233,6 +233,10 @@ static const char * const iio_ev_type_text[] = {
 	[IIO_EV_TYPE_MAG_REFERENCED] = "mag_referenced",
 	[IIO_EV_TYPE_GESTURE] = "gesture",
 	[IIO_EV_TYPE_FAULT] = "fault",
+	[IIO_EV_TYPE_THRESH2] = "thresh2",
+	[IIO_EV_TYPE_THRESH3] = "thresh3",
+	[IIO_EV_TYPE_THRESH4] = "thresh4"
+
 };
 
 static const char * const iio_ev_dir_text[] = {
