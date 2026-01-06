@@ -108,10 +108,22 @@ static int meson_pcie_get_mems(struct platform_device *pdev,
 			       struct meson_pcie *mp)
 {
 	struct dw_pcie *pci = &mp->pci;
+	struct resource *res;
 
-	pci->dbi_base = devm_platform_ioremap_resource_byname(pdev, "elbi");
-	if (IS_ERR(pci->dbi_base))
-		return PTR_ERR(pci->dbi_base);
+	/*
+	 * For the broken DTs that supply 'dbi' as 'elbi', parse the 'elbi'
+	 * region and assign it to both 'pci->elbi_base' and 'pci->dbi_space' so
+	 * that the DWC core can skip parsing both regions.
+	 */
+	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "elbi");
+	if (res) {
+		pci->elbi_base = devm_pci_remap_cfg_resource(pci->dev, res);
+		if (IS_ERR(pci->elbi_base))
+			return PTR_ERR(pci->elbi_base);
+
+		pci->dbi_base = pci->elbi_base;
+		pci->dbi_phys_addr = res->start;
+	}
 
 	mp->cfg_base = devm_platform_ioremap_resource_byname(pdev, "cfg");
 	if (IS_ERR(mp->cfg_base))
@@ -335,7 +347,7 @@ static struct pci_ops meson_pci_ops = {
 	.write = pci_generic_config_write,
 };
 
-static int meson_pcie_link_up(struct dw_pcie *pci)
+static bool meson_pcie_link_up(struct dw_pcie *pci)
 {
 	struct meson_pcie *mp = to_meson_pcie(pci);
 	struct device *dev = pci->dev;
@@ -363,7 +375,7 @@ static int meson_pcie_link_up(struct dw_pcie *pci)
 			dev_dbg(dev, "speed_okay\n");
 
 		if (smlh_up && rdlh_up && ltssm_up && speed_okay)
-			return 1;
+			return true;
 
 		cnt++;
 
@@ -371,7 +383,7 @@ static int meson_pcie_link_up(struct dw_pcie *pci)
 	} while (cnt < WAIT_LINKUP_TIMEOUT);
 
 	dev_err(dev, "error: wait linkup timeout\n");
-	return 0;
+	return false;
 }
 
 static int meson_pcie_host_init(struct dw_pcie_rp *pp)
